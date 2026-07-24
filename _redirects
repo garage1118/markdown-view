@@ -1,3 +1,0 @@
-# Redirects
-# Enforce non-www
-https://www.markdownviewer.dev/* https://markdownviewer.dev/:splat 301
