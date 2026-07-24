@@ -35,17 +35,13 @@
     <link rel="manifest" href="./favicon/site.webmanifest">
 
     <!-- Fonts (vendored) -->
-    <link href="vendor/fonts/fonts.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript>
-        <link rel="stylesheet" href="vendor/fonts/fonts.css">
-    </noscript>
+    <link href="vendor/fonts/fonts.css" rel="stylesheet">
 
-    <!-- Highlight.js - Defer loading (vendored) -->
-    <link rel="stylesheet" href="vendor/highlightjs/github-dark.min.css" id="hljs-theme" media="print"
-        onload="this.media='all'">
+    <!-- Highlight.js (vendored) -->
+    <link rel="stylesheet" href="vendor/highlightjs/github-dark.min.css" id="hljs-theme">
 
-    <!-- KaTeX - Defer loading (vendored) -->
-    <link rel="stylesheet" href="vendor/katex/katex.min.css" media="print" onload="this.media='all'">
+    <!-- KaTeX (vendored) -->
+    <link rel="stylesheet" href="vendor/katex/katex.min.css">
 
     <!-- Main Styles Inlined for Performance -->
     <style>
@@ -96,15 +92,8 @@
             background: var(--text-muted);
         }
     </style>
-    <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
-    <noscript>
-        <link rel="stylesheet" href="style.css">
-    </noscript>
-    <link rel="preload" as="style" href="themes.css">
-    <link rel="stylesheet" href="themes.css" media="print" onload="this.media='all'">
-    <noscript>
-        <link rel="stylesheet" href="themes.css">
-    </noscript>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="themes.css">
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -192,7 +181,8 @@
         <!-- Header -->
         <header class="header">
             <div class="logo">
-                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg class="logo-icon" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M3 5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V5Z"
                         stroke="currentColor" stroke-width="2" />
