@@ -68,100 +68,92 @@ const COMMANDS = [
     { id: 'reading-mode', title: 'Reading Mode', desc: 'Distraction-free reading', shortcut: ['F11'], icon: '📖' },
     { id: 'toggle-toc', title: 'Toggle Table of Contents', desc: 'Show/hide TOC', shortcut: [], icon: '📑' },
     { id: 'undo', title: 'Undo', desc: 'Undo last action', shortcut: ['Ctrl', 'Z'], icon: '↩' },
-    { id: 'redo', title: 'Redo', desc: 'Redo last action', shortcut: ['Ctrl', 'Shift', 'Z'], icon: '↪' }
+    { id: 'redo', title: 'Redo', desc: 'Redo last action', shortcut: ['Ctrl', 'Shift', 'Z'], icon: '↪' },
+    { id: 'reset-default', title: 'Reset to Default Content', desc: 'Discard your document and restore the sample content', shortcut: [], icon: '↺' }
 ];
 
 // Default markdown content
-const DEFAULT_MARKDOWN = `# Welcome to Markdown Viewer! 🚀
+const DEFAULT_MARKDOWN = `# Markdown Syntax Demo
 
-The **fastest** and most beautiful way to write and preview Markdown online.
-
----
-
-## ✨ Features
-
-- 📝 **Live Preview** — See changes instantly as you type
-- 🎨 **22 Themes** — GitHub, Notion, Obsidian, Dracula, Nord, and more
-- 📊 **Mermaid Diagrams** — Flowcharts, sequences, and Gantt charts
-- 📐 **LaTeX Math** — Beautiful math equations with KaTeX
-- 💻 **Syntax Highlighting** — 190+ programming languages
-- 📤 **Export** — PDF, HTML, and Markdown
-- ⌨️ **Command Palette** — Press \`Ctrl+K\` for quick actions
+A quick reference for what this editor renders.
 
 ---
 
-## Code Example
+## Text formatting
 
-\`\`\`javascript
-function greet(name) {
-    console.log(\`Hello, \${name}!\`);
-}
+**bold**, *italic*, ~~strikethrough~~, and \`inline code\`.
 
-greet('World');
-\`\`\`
+## Headings
 
----
+# H1
+## H2
+### H3
 
-## LaTeX Math
+## Lists
 
-Inline math: $E = mc^2$
+- Unordered item
+- Another item
+  - Nested item
 
-Block math:
-$$
-\\sum_{i=1}^{n} x_i = \\frac{n(n+1)}{2}
-$$
+1. Ordered item
+2. Second item
 
----
+- [x] Completed task
+- [ ] Open task
 
-## Mermaid Diagram
+## Links and images
 
-\`\`\`mermaid
-graph TD
-    A[Start] --> B{Is it working?}
-    B -->|Yes| C[Great!]
-    B -->|No| D[Debug]
-    D --> B
-\`\`\`
+[A link](https://example.com)
 
----
+![Example image](data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='120'%3E%3Crect width='300' height='120' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%23555'%3EExample Image%3C/text%3E%3C/svg%3E)
 
-## Custom Syntax Extensions
+## Blockquotes
 
-::center This text is centered::
-
-::right This text is right-aligned::
-
-//pagebreak//
-
----
+> A blockquote.
+> Spans multiple lines.
 
 ## Tables
 
-| Feature | Status |
-|---------|--------|
-| Live Preview | ✅ |
-| Dark Mode | ✅ |
-| Export | ✅ |
-| Diagrams | ✅ |
+| Feature | Supported |
+|---|---|
+| Tables | Yes |
+| Task lists | Yes |
+| Syntax highlighting | Yes |
+
+## Code blocks
+
+\`\`\`javascript
+function greet(name) {
+    return \`Hello, \${name}!\`;
+}
+\`\`\`
+
+\`\`\`python
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
+\`\`\`
+
+## Math (KaTeX)
+
+Inline: $E = mc^2$
+
+Block:
+
+$$
+\\int_0^\\infty e^{-x^2} \\, dx = \\frac{\\sqrt{\\pi}}{2}
+$$
+
+## Diagrams (Mermaid)
+
+\`\`\`mermaid
+graph TD
+    A[Write Markdown] --> B[Live Preview]
+    B --> C[Export]
+\`\`\`
 
 ---
 
-## Task List
-
-- [x] Write markdown
-- [x] Add live preview
-- [x] Implement themes
-- [ ] Take over the world
-
----
-
-> "The only way to do great work is to love what you do."
-> — Steve Jobs
-
----
-
-**Start writing!** Your content is automatically saved locally.
-`;
+Press \`Ctrl+K\` for the command palette.`;
 
 // ===================================
 // DOM Elements
@@ -282,6 +274,16 @@ function initMermaid() {
 // Custom Syntax Extensions
 // ===================================
 function preprocessMarkdown(text) {
+    // Flatten multi-line display math ($$...$$ and \[...\]) onto one line.
+    // marked is configured with `breaks: true`, which turns every newline
+    // inside a paragraph into a literal <br>. That splits display math across
+    // separate DOM text nodes, and KaTeX's auto-render only matches
+    // delimiters within a single text node, so the split math never renders.
+    // Newlines are insignificant whitespace in LaTeX math mode, so collapsing
+    // them to spaces here doesn't change the rendered formula.
+    text = text.replace(/\$\$[\s\S]*?\$\$/g, (match) => match.replace(/\r?\n/g, ' '));
+    text = text.replace(/\\\[[\s\S]*?\\\]/g, (match) => match.replace(/\r?\n/g, ' '));
+
     // Center text: ::center text::
     text = text.replace(/::center\s+(.+?)::/g, '<div class="text-center">$1</div>');
 
@@ -778,6 +780,16 @@ function executeCommand(commandId) {
         case 'toggle-toc': toggleTOC(); break;
         case 'undo': undo(); break;
         case 'redo': redo(); break;
+        case 'reset-default': resetToDefault(); break;
+    }
+}
+
+function resetToDefault() {
+    if (confirm('Discard your current document and restore the default sample content? This cannot be undone.')) {
+        localStorage.removeItem(CONFIG.STORAGE_KEY);
+        elements.markdownInput.value = DEFAULT_MARKDOWN;
+        renderMarkdown();
+        showToast('Reset to default content');
     }
 }
 
